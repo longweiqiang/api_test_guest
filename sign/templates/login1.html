@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>发布会管理系统</title>
+</head>
+<body>
+    <h3>发布会管理系统</h3>
+    <form method="post" action="/login_action/">
+        <td>用户名:</td>
+        <input name="username" type="text" placeholder="请输入用户名"><br>
+        <td>密 码:</td>
+        <input name="password" type="password" placeholder="请输入密码"><br>
+        {{ error }}<br>
+        <button id="btn" type="submit">登录</button>
+        {% csrf_token %}
+    </form>
+</body>
+</html>
