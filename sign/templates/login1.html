@@ -11,7 +11,7 @@
         <input name="username" type="text" placeholder="请输入用户名"><br>
         <td>密 码:</td>
         <input name="password" type="password" placeholder="请输入密码"><br>
-        {{ error }}<br>
+        <p style="color: red">{{ error }}</p><br>
         <button id="btn" type="submit">登录</button>
         {% csrf_token %}
     </form>
