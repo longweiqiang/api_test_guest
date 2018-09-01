@@ -2,6 +2,7 @@ from django.contrib import auth
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from sign.models import Guest, Event
 
 # Create your views here.
 
@@ -66,8 +67,11 @@ def event_manage(request):
 
     # 读取浏览器 session
     user_session = request.session.get('user', '')
+    # 增加发布会查询
+    event_list = Event.objects.all()
+    print(event_list)
 
-    return render(request, 'event_manage.html', {'user':user_session})
+    return render(request, 'event_manage.html', {'user':user_session, 'events':event_list})
 
 
 
