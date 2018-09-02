@@ -23,5 +23,12 @@ urlpatterns = [
     path('login/', views.login),
     path('login_action/', views.login_action),
     path('event_manage/', views.event_manage),
-    path('accounts/login/', views.login)
+    path('accounts/login/', views.login),
+    path('guest_manage/', views.guest_manage),
+    path('search_phone/', views.search_phone),
+    path('sign_index/<int:event_id>/', views.sign_index),
+    path('sign_index_action/<int:event_id>/', views.sign_index_action),
+    path('logout/', views.logout),
+
+
 ]

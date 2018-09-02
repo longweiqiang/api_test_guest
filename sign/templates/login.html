@@ -107,7 +107,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <form action="/chaos/EvilEmail.html" method="post">
+    <form action="/login_action/" method="post">
         <div class="loginBox">
             <div class="loginBoxCenter">
                 <p><label for="username">用户名：</label></p>
@@ -123,11 +123,12 @@
             </div>
             <div class="loginBoxButtons">
 
-
+                <p style="color: red">{{ error }}</p><br>
                 <button class="loginBtn">登录</button>
                 <div> 新用户注册</div>
             </div>
         </div>
+        {% csrf_token %}
     </form>
 </div>
 </body>

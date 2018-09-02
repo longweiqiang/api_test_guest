@@ -1,4 +1,48 @@
 <!DOCTYPE html>
+
+<html>
+
+<head>
+    {% load bootstrap3 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+
+<body>
+<div class="container" style="width: 330px;">
+    <form class="form-signin" method="post" action="/login_action/">
+        <h2 class="form-signin-heading">发布会管理系统</h2>
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input name="username" type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password"  required style="
+    margin-top: 10px;">
+        <p style="color:red; margin-top: 10px;">{{error}}</p> <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+        {% csrf_token %}
+    </form>
+</div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,3 +61,4 @@
     </form>
 </body>
 </html>
+-->
