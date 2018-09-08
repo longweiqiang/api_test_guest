@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from sign.models import Guest, Event
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from sign.forms import AddEventForm, AddGuestForm
 
 # Create your views here.
 
@@ -75,6 +76,34 @@ def event_manage(request):
     return render(request, 'event_manage.html', {'user':user_session, 'events':event_list})
 
 
+# 添加发布会
+def add_event(request):
+    # 读取浏览器 session
+    user_session = request.session.get('user', '')
+
+    if request.method == 'POST':
+        form = AddEventForm(request.POST) # form 包含提交的数据
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            address = form.cleaned_data['address']
+            limit = form.cleaned_data['limit']
+            start_time = form.cleaned_data['start_time']
+            status = form.cleaned_data['status']
+            if status is True:
+                status = 1
+            else:
+                status = 0
+
+            Event.objects.create(name=name,limit=limit,address=address,status=status,start_time=start_time)
+            return render(request, "add_event.html", {"user": user_session, "form": form, "success": "添加发布会成功!"})
+
+    else:
+        form = AddEventForm()
+
+    return render(request, "add_event.html", {"user": user_session, "form": form})
+
+
+
 # 嘉宾列表
 @login_required
 def guest_manage(request):
@@ -94,6 +123,36 @@ def guest_manage(request):
         # 如果页数超出查询范围，取最后一页
         contacts = paginator.page(paginator.num_pages)
     return render(request, "guest_manage.html", {"user":user_session, "guest":contacts})
+
+
+
+# 添加嘉宾
+def add_guest(request):
+    # 读取浏览器 session
+    user_session = request.session.get('user', '')
+
+    if request.method == 'POST':
+        form = AddGuestForm(request.POST)
+
+        if form.is_valid():
+            event = form.cleaned_data['event']
+            realname = form.cleaned_data['realname']
+            phone = form.cleaned_data['phone']
+            email = form.cleaned_data['email']
+            sign = form.cleaned_data['sign']
+            if sign is True:
+                sign = 1
+            else:
+                sign = 0
+
+            Guest.objects.create(event=event,realname=realname,phone=phone,email=email,sign=sign)
+            return render(request, "add_guest.html", {"user": user_session, "form": form, "success": "添加嘉宾成功!"})
+
+    else:
+        form = AddGuestForm()
+
+    return render(request, "add_guest.html", {"user": user_session, "form": form})
+
 
 
 # 通过手机号码查询嘉宾列表
