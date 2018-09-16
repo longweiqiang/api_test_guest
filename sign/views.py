@@ -1,6 +1,6 @@
 from django.contrib import auth
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from sign.models import Guest, Event
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -237,6 +237,17 @@ def logout(request):
     auth.logout(request) #退出登录
     response = HttpResponseRedirect('/logout/')
     return response
+
+
+
+def api_test(request):
+    """
+    第一个接口练习
+    :param request: 
+    :return: 
+    """
+    data = {"message":"请求成功", "data":{"id":1, "name":"小米发布会"}}
+    return JsonResponse(data)
 
 
 
