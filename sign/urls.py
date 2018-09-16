@@ -14,6 +14,7 @@ urlpatterns = [
     path('add_event/', views_api.add_event),
     path('get_guest_list/', views_api.get_guest_list),
     path('add_guest/', views_api.add_guest),
+    path('user_sign/', views_api.user_sign),
 
 
 

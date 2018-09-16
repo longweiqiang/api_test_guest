@@ -7,6 +7,7 @@
 # @TODO       :
 import json
 
+import time
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from sign.models import Event, Guest
@@ -52,7 +53,6 @@ def add_event(requset):
     :param requset: name, limit, status, address, start_time
     :return: 
     """
-    # post-->form
     if requset.method == "POST":
         # # 获取前端以form表单方式传的参数
         # name = requset.POST.get("name", "")
@@ -138,14 +138,13 @@ def get_guest_list(request):
         return JsonResponse({"status":100, "message":"请求方式有误"})
 
 
-def add_guest(requset):
+def add_guest(request):
     """
     添加嘉宾
     :param requset: event_id, realname, phone, email, sign
     :return: 
     """
-    # post-->form
-    if requset.method == "POST":
+    if request.method == "POST":
         # # 获取前端以form表单方式传的参数
         # event_id = requset.POST.get("event_id", "")
         # realname = requset.POST.get("realname", "")
@@ -155,7 +154,7 @@ def add_guest(requset):
 
 
         # 获取前端以json方式传的参数
-        guest_dict = json.loads(requset.body)
+        guest_dict = json.loads(request.body)
 
         event_id = guest_dict["event_id"]
         realname = guest_dict["realname"]
@@ -177,7 +176,7 @@ def add_guest(requset):
 
         """
         此处需要对入参中的event_id参数进行校验，如果入参event_id的值不能和库中event_id匹配，
-        # 则代表该event_id不存在，无法新增嘉宾
+        则代表该event_id不存在，无法新增嘉宾
         """
         # 查询所有的发布会
         guests = Guest.objects.all()
@@ -189,7 +188,7 @@ def add_guest(requset):
 
         # 判断入参的event_id是否存在于guest_list中，如果不存在，则只需if语句块，返回对应json
         if event_id not in guest_list:
-            return JsonResponse({"status":103, "message":"event_id不存在"})
+            return JsonResponse({"status":103, "message":"发布会id不存在"})
 
 
 
@@ -229,6 +228,90 @@ def add_guest(requset):
     else:
         # 如果请求方式不是post，则抛出此信息
         return JsonResponse({"status":100, "message":"请求方式有误"})
+
+
+def user_sign(request):
+    """
+    发布会签到
+    :param request: 
+    :return: 
+    """
+    if request.method == "POST":
+        # # 获取前端以form表单方式传的参数
+        # id = request.POST.get("id", "")
+        # phone = request.POST.get("phone", "")
+
+        # 获取前端以json方式传的参数
+        sign_dict = json.loads(request.body)
+
+        id = sign_dict["id"]
+        phone = sign_dict["phone"]
+
+        # 对各个字段进行空字符串判断，并返回给前台
+        if id == "" or phone == "":
+            return JsonResponse({"status":101, "message":"请求参数为空"})
+
+        if type(id) != int:
+            return JsonResponse({"status":102, "message":"发布会id参数类型有误"})
+
+        if len(phone) != 11:
+            # print(len(phone))
+            return JsonResponse({"status":103, "message":"手机号长度有误"})
+
+        # 获取发布会id，并判断id是否存在，如果不存在，则返回
+        try:
+            result = Event.objects.get(id=id)
+        except Event.DoesNotExist:
+            return JsonResponse({"status": 104, "message": "发布会id不存在"})
+
+        # 判断发布会status状态值，如果是False，则代表发布会未开启，无法签到
+        if result.status is False:
+            return JsonResponse({"status": 105, "message": "发布会未开启，不能签到"})
+
+        # 获取发布会时间，并转换成YYY-MM-DD HH:MM:SS格式
+        event_time = result.start_time     # 发布会时间
+        timeArray = time.strptime(str(event_time), "%Y-%m-%d %H:%M:%S")
+        e_time = int(time.mktime(timeArray))
+
+        # 获取当前时间
+        now_time = str(time.time())          # 当前时间
+        ntime = now_time.split(".")[0]
+        n_time = int(ntime)
+
+        # 拿当前时间与发布会时间进行比较，如果当前时间大于等于发布会时间，则返回异常
+        if n_time >= e_time:
+            return JsonResponse({'status':106,"message":"发布会已开始，无法签到"})
+
+        # 获取用户手机号
+        result = Guest.objects.filter(phone=phone)
+
+        # 判断入参的手机号是否存在数据库中
+        if not result:
+            return JsonResponse({'status':107,"message":"签到手机号不存在"})
+        else:
+            for res in result:
+                if res.event_id == int(id):
+                    break
+            else:
+                return JsonResponse({'status': 108, 'message': '用户没有参加本场发布会'})
+
+
+        result = Guest.objects.get(event_id=id, phone=phone)
+
+        # 判断用户是否已签到
+        if result.sign is True:
+            return JsonResponse({'status': 109, 'message': '用户已签到，请勿重复签到'})
+
+        # 如果未签到，则执行签到动作，并返回成功
+        else:
+            result.sign = True
+            result.save()
+            return JsonResponse({'status':200,'message':'用户签到成功'})
+
+    else:
+        return JsonResponse({"status":100, "message":"请求方式有误"})
+
+
 
 
 
