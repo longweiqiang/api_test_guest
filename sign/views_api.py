@@ -11,6 +11,7 @@ import time
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from sign.models import Event, Guest
+from django.forms.models import model_to_dict
 
 
 def get_event_list(request):
@@ -156,11 +157,14 @@ def add_guest(request):
         # 获取前端以json方式传的参数
         guest_dict = json.loads(request.body)
 
-        event_id = guest_dict["event_id"]
-        realname = guest_dict["realname"]
-        phone = guest_dict["phone"]
-        email = guest_dict["email"]
-        sign = guest_dict["sign"]
+        try:
+            event_id = guest_dict["event_id"]
+            realname = guest_dict["realname"]
+            phone = guest_dict["phone"]
+            email = guest_dict["email"]
+            sign = guest_dict["sign"]
+        except KeyError:
+            return JsonResponse({"status":500, "message":"字段不能为空"})
 
         # print(type(event_id))
 
@@ -244,8 +248,11 @@ def user_sign(request):
         # 获取前端以json方式传的参数
         sign_dict = json.loads(request.body)
 
-        id = sign_dict["id"]
-        phone = sign_dict["phone"]
+        try:
+            id = sign_dict["id"]
+            phone = sign_dict["phone"]
+        except KeyError:
+            return JsonResponse({"status":500, "message":"字段不能为空"})
 
         # 对各个字段进行空字符串判断，并返回给前台
         if id == "" or phone == "":
